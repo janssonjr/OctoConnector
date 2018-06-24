@@ -1,0 +1,14 @@
+-Either highscore or levels
+	-Highscore
+		-You have X lives. if you miss to connect you lose a live.
+
+	-Levels
+		#-Connect all octus that jumps up in X amount of jumps.
+		-Connect X amount of jumping octus in X amount of jumps.
+		#-Connect all X octus that jumps up in X seconds.
+		-Connect all octus that jumps up X times in a row.
+		-Connect x amount of same color
+
+
+
+BUG: If you win on the last move it might count as a lose. /Think it is fixed

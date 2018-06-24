@@ -1,0 +1,217 @@
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI.Extensions;
+
+public class SpawnerManager : MonoBehaviour {
+
+    public List<Rigidbody2D> shapes = new List<Rigidbody2D>();
+    public List<Shape> shapeForced = new List<Shape>();
+
+    private static SpawnerManager instance;
+
+    public static SpawnerManager Instance
+    {
+        get { return instance; }
+    }
+
+    int collisionCount = 0;
+
+    bool shouldCheckWinCondition = false;
+
+    bool isRunning = false;
+
+    private void OnEnable()
+    {
+        instance = this;
+        EventManager.OnGameEvent += OnGameState;
+    }
+
+    private void OnDisable()
+    {
+        EventManager.OnGameEvent -= OnGameState;
+    }
+
+    private void OnGameState(EventManager.GameEvent obj)
+    {
+        switch (obj.myType)
+        {
+            case EventManager.GameEvent.EventType.NewWave:
+                break;
+            case EventManager.GameEvent.EventType.Win:
+                {
+                    //StartCoroutine(ResetShapesRoutine(1f));
+                    shouldCheckWinCondition = false;
+                }
+                break;
+            case EventManager.GameEvent.EventType.StartGame:
+                {
+                    Debug.Log("Starting Game");
+                    StopAllCoroutines();
+                    isRunning = true;
+                    shouldCheckWinCondition = false;
+                    collisionCount = 0;
+                    ResetAllShapes();
+                    StartCoroutine(AddForce());
+
+                }
+                break;
+            case EventManager.GameEvent.EventType.GameOver:
+            case EventManager.GameEvent.EventType.LevelComplete:
+            case EventManager.GameEvent.EventType.PauseGame:
+                isRunning = false;
+                break;
+            case EventManager.GameEvent.EventType.ResumeGame:
+                isRunning = true;
+                break;
+            case EventManager.GameEvent.EventType.NextLevel:
+                {
+
+                    ResetAllShapes();
+                    StopAllCoroutines();
+                    isRunning = true;
+                    collisionCount = 4;
+                    StartCoroutine(AddForce());
+                    break;
+                }
+            case EventManager.GameEvent.EventType.ShapeReset:
+                {
+                    SetShapesActive();
+                    ResetShapesPosition();
+                    StartCoroutine(ResetShapesRoutine(1f));
+                    break;
+                }
+			case EventManager.GameEvent.EventType.InkDone:
+				isRunning = true;
+				break;
+        }
+    }
+
+    private void SetShapesActive()
+    {
+        for(int i = 0; i < shapes.Count; ++i)
+        {
+            shapes[i].gameObject.SetActive(true);
+        }
+    }
+
+    IEnumerator AddForce()
+    {
+        yield return new WaitForSeconds(2);
+        while (true)
+        {
+            yield return new WaitForSeconds(1f);
+			int range = UnityEngine.Random.Range(2, shapes.Count + 1);
+
+            shapeForced.Clear();
+            EventManager.NewWave();
+            shouldCheckWinCondition = true;
+            Shuffle();
+            for (int i = 0; i < range; ++i)
+            {
+                //500 - 700
+                shapes[i].AddForce(Vector2.up * UnityEngine.Random.Range(500, 650));
+                shapeForced.Add(shapes[i].GetComponent<Shape>());
+                shapeForced[shapeForced.Count - 1].Launched();
+
+            }
+            Debug.Log("Adding force. "+ collisionCount.ToString() + " is colliding ");
+            yield return new WaitForSeconds(1f);
+            yield return new WaitUntil(() =>
+            {
+                return collisionCount == shapes.Count && isRunning == true;
+            });
+        }
+    }
+
+    void Shuffle()
+    {
+        for(int i =0; i < shapes.Count; ++i)
+        {
+            var temp = shapes[i];
+            int randomIndex = UnityEngine.Random.Range(i, shapes.Count);
+            shapes[i] = shapes[randomIndex];
+            shapes[randomIndex] = temp;
+        }
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if(collision.gameObject.layer == LayerMask.NameToLayer("Shape"))
+        {
+            collisionCount++;
+            Debug.Log("OnEnter: CollisionCount: " + collisionCount.ToString());
+            Shape shapeToRemove = collision.gameObject.GetComponent<Shape>();
+            if (shapeForced.Find(a => { return a == shapeToRemove; }) == null)
+                return;
+            if (shapeToRemove.WasDrawn == false && shapeForced.Count > 0 && shouldCheckWinCondition == true)
+            {
+                EventManager.Lose();
+                shouldCheckWinCondition = false;
+				isRunning = false;
+                StartCoroutine(ResetShapesRoutine(1f));
+            }            
+            shapeToRemove.OnGround();
+        }
+    }
+
+    IEnumerator ResetShapesRoutine(float aWaitTime)
+    {
+        yield return new WaitForSeconds(aWaitTime);
+        ResetShapes();
+    }
+
+    void ResetShapes()
+    {
+        foreach (var shape in shapes)
+        {
+            shape.bodyType = RigidbodyType2D.Dynamic;
+        }
+    }
+
+    public void ResetAllShapes()
+    {
+        ResetShapes();
+        SetShapesActive();
+        ResetShapesPosition();
+		ResetShapesRotation();
+		ResetShapeScale();
+    }
+
+	private void ResetShapeScale()
+	{
+		foreach (var s in shapes)
+		{
+			s.transform.localScale = new Vector3(1f, 1f, 1f);
+		}
+	}
+
+	void ResetShapesRotation()
+	{
+		foreach (var s in shapes)
+		{
+			s.transform.localRotation = Quaternion.identity;
+		}
+
+	}
+
+    private void OnCollisionExit2D(Collision2D collision)
+    {
+        if (collision.gameObject.layer == LayerMask.NameToLayer("Shape"))
+        {
+            if(collisionCount > 0)
+                collisionCount--;
+            Debug.Log("OnExits: CollisionCount: " + collisionCount.ToString());
+        }
+    }
+
+    void ResetShapesPosition()
+    {
+        foreach (var s in shapes)
+        {
+            Shape shape = s.GetComponentInParent<Shape>();
+            shape.ResetPosition();
+        }
+    }
+}
