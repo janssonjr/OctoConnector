@@ -12,6 +12,7 @@ public class LevelInfoPanel : Panel{
     public Sprite star;
 	public RectTransform background;
 	public GameObject content;
+	public PanelAnimation panelAnimation;
 
     LevelData myLevelData;
 
@@ -22,15 +23,15 @@ public class LevelInfoPanel : Panel{
 
     private void OnEnable()
     {
-		objectToMove.transform.localPosition = new Vector3(0f, -2000f, 0f);
-        Hashtable hash = new Hashtable();
-        hash.Add("position", new Vector3(0f, 0f, 0f));
-        hash.Add("time", 1f);
-        hash.Add("islocal", true);
-		hash.Add("oncomplete", "OnShowComplete");
-		hash.Add("oncompletetarget", gameObject);
+		//objectToMove.transform.localPosition = new Vector3(0f, -2000f, 0f);
+  //      Hashtable hash = new Hashtable();
+  //      hash.Add("position", new Vector3(0f, 0f, 0f));
+  //      hash.Add("time", 1f);
+  //      hash.Add("islocal", true);
+		//hash.Add("oncomplete", "OnShowComplete");
+		//hash.Add("oncompletetarget", gameObject);
 
-        iTween.MoveTo(objectToMove, hash);
+        //iTween.MoveTo(objectToMove, hash);
 
         if(myLevelData.IsComplete == true)
         {
@@ -46,7 +47,7 @@ public class LevelInfoPanel : Panel{
 
 	void OnShowComplete()
 	{
-		iTween.ValueTo(background.gameObject, iTween.Hash("from", 660, "to", 1300, "time", 0.5f, "onupdate","UpdateValue", "onupdatetarget",gameObject));
+		//iTween.ValueTo(background.gameObject, iTween.Hash("from", 660, "to", 1300, "time", 0.5f, "onupdate","UpdateValue", "onupdatetarget",gameObject));
 	}
 
 	void UpdateValue(float aValue)
@@ -60,18 +61,20 @@ public class LevelInfoPanel : Panel{
 
 	void HidePanel(string aHideCompleteFunction)
     {
-        Hashtable hash = new Hashtable();
-        hash.Add("position", new Vector3(0f, -2000f, 0f));
-        hash.Add("time", 1f);
-        hash.Add("islocal", true);
-        hash.Add("oncomplete", aHideCompleteFunction);
-        hash.Add("oncompletetarget", gameObject);
-        iTween.MoveTo(objectToMove, hash);
+        //Hashtable hash = new Hashtable();
+        //hash.Add("position", new Vector3(0f, -2000f, 0f));
+        //hash.Add("time", 1f);
+        //hash.Add("islocal", true);
+        //hash.Add("oncomplete", aHideCompleteFunction);
+        //hash.Add("oncompletetarget", gameObject);
+        //iTween.MoveTo(objectToMove, hash);
     }
 
     public void Play()
     {
-        HidePanel("OnHideDonePlay");
+		panelAnimation.HidePanel("OnHideDonePlay");
+
+		HidePanel("OnHideDonePlay");
     }
 
     void OnHideDonePlay()
@@ -83,15 +86,16 @@ public class LevelInfoPanel : Panel{
 
     public void Cancle()
     {
-		iTween.ValueTo(background.gameObject, 
-			iTween.Hash(
-				"from", 1300, 
-				"to", 660, 
-				"time", 0.5f, 
-				"onupdate", "UpdateScrollHide", 
-				"onupdatetarget", gameObject,
-				"oncomplete", "HidePanelScrollDone",
-				"oncompletetarget", gameObject));
+		panelAnimation.HidePanel("OnHideDoneCancle");
+		//iTween.ValueTo(background.gameObject, 
+		//	iTween.Hash(
+		//		"from", 1300, 
+		//		"to", 660, 
+		//		"time", 0.5f, 
+		//		"onupdate", "UpdateScrollHide", 
+		//		"onupdatetarget", gameObject,
+		//		"oncomplete", "HidePanelScrollDone",
+		//		"oncompletetarget", gameObject));
 
 
 	}

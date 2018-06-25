@@ -5,6 +5,7 @@ using UnityEngine;
 public class GameOverPanel : Panel {
 
     public GameObject objectToMove;
+	public PanelAnimation panelAnmation;
 
     private void Awake()
     {
@@ -13,29 +14,30 @@ public class GameOverPanel : Panel {
 
     private void OnEnable()
     {
-        objectToMove.transform.localPosition = new Vector3(0f, -2000f, 0f);
-        Hashtable hash = new Hashtable();
-        hash.Add("position", new Vector3(0f, 0f, 0f));
-        hash.Add("time", 1f);
-        hash.Add("islocal", true);
+        //objectToMove.transform.localPosition = new Vector3(0f, -2000f, 0f);
+        //Hashtable hash = new Hashtable();
+        //hash.Add("position", new Vector3(0f, 0f, 0f));
+        //hash.Add("time", 1f);
+        //hash.Add("islocal", true);
 
-        iTween.MoveTo(objectToMove, hash);
+        //iTween.MoveTo(objectToMove, hash);
     }
 
     void HidePanel(string aHideCompleteFunction)
     {
-        Hashtable hash = new Hashtable();
-        hash.Add("position", new Vector3(0f, -2000f, 0f));
-        hash.Add("time", 1f);
-        hash.Add("islocal", true);
-        hash.Add("oncomplete", aHideCompleteFunction);
-        hash.Add("oncompletetarget", gameObject);
-        iTween.MoveTo(objectToMove, hash);
+        //Hashtable hash = new Hashtable();
+        //hash.Add("position", new Vector3(0f, -2000f, 0f));
+        //hash.Add("time", 1f);
+        //hash.Add("islocal", true);
+        //hash.Add("oncomplete", aHideCompleteFunction);
+        //hash.Add("oncompletetarget", gameObject);
+        //iTween.MoveTo(objectToMove, hash);
     }
 
     public void Retry()
     {
-        HidePanel("OnHideDoneRetry");
+		panelAnmation.HidePanel("OnHideDoneRetry");
+        //HidePanel("OnHideDoneRetry");
     }
 
     void OnHideDoneRetry()
@@ -46,10 +48,11 @@ public class GameOverPanel : Panel {
 
     public void Quit()
     {
-        HidePanel("OnHideDoneQuit");
-    }
+		panelAnmation.HidePanel("OnHideDoneQuit");
+		//HidePanel("OnHideDoneQuit");
+	}
 
-    void OnHideDoneQuit()
+	void OnHideDoneQuit()
     {
         CanvasManager.OpenPanel(PanelEnum.LevelSelectPanel, panelType);
         CanvasManager.ClosePanel(PanelEnum.InGamePanel);

@@ -6,6 +6,7 @@ public class AnimationFunctions : MonoBehaviour
 {
 
 	public Shape shape;
+	public GameObject blastParticles;
 
 	public void MovedToTarget()
 	{
@@ -13,6 +14,7 @@ public class AnimationFunctions : MonoBehaviour
 		transform.localPosition = Vector3.zero;
 		transform.localRotation = Quaternion.identity;
 		transform.localScale = new Vector3(0.08f, 0.08f, 1f);
+		blastParticles.SetActive(false);
 	}
 
 }

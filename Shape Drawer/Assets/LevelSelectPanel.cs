@@ -31,11 +31,13 @@ public class LevelSelectPanel : Panel {
         for(int i = 0; i < levels.Count; ++i)
         {
             var entry = Instantiate(levelButtonPrfab, levelParent);
-			levelParent.sizeDelta += new Vector2(0, entry.GetComponent<LayoutElement>().preferredHeight);
+			levelParent.sizeDelta += new Vector2(0, entry.GetComponent<LayoutElement>().preferredHeight + 50);
             entry.SetUp(levels[i]);
 			//entry.transform.SetAsFirstSibling();           
+
 			RectTransform rect = entry.GetComponent<RectTransform>();
-            rect.localPosition = new Vector3((i % 2) * 450, i * 400, 0f);
+			float x = (i % 2) == 0 ? -250 : 250;
+            rect.localPosition = new Vector3(x, i * 400 + 50, 0f);
 			entry.gameObject.SetActive(true);
             buttons.Add(entry);
         }
@@ -53,7 +55,8 @@ public class LevelSelectPanel : Panel {
 				var entry = buttons[i];
 
 				RectTransform rect = entry.GetComponent<RectTransform>();
-				rect.localPosition = new Vector3((i % 2) * 450, i * 400);
+				float x = (i % 2) == 0 ? -250 : 250;
+				rect.localPosition = new Vector3(x, i * 400 + 50, 0f);
 			}
 			haveSetPosition = true;
 		}

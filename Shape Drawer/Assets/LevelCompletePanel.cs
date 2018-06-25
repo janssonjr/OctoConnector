@@ -6,6 +6,7 @@ public class LevelCompletePanel : Panel {
 
     public GameObject objectToMove;
     public GameObject nextLevelButton;
+	public PanelAnimation panelAnimation;
 
     private void Awake()
     {
@@ -14,17 +15,17 @@ public class LevelCompletePanel : Panel {
 
     private void OnEnable()
     {
-        objectToMove.transform.localPosition = new Vector3(0f, -2000f, 0f);
-        Hashtable hash = new Hashtable();
-        hash.Add("position", new Vector3(0f, 0f, 0f));
-        hash.Add("time", 1f);
-        hash.Add("islocal", true);
+        //objectToMove.transform.localPosition = new Vector3(0f, -2000f, 0f);
+        //Hashtable hash = new Hashtable();
+        //hash.Add("position", new Vector3(0f, 0f, 0f));
+        //hash.Add("time", 1f);
+        //hash.Add("islocal", true);
 
-        iTween.MoveTo(objectToMove, hash);
+        //iTween.MoveTo(objectToMove, hash);
 
-        nextLevelButton.SetActive(GameManager.IsLastLevel() == false);
+        //nextLevelButton.SetActive(GameManager.IsLastLevel() == false);
 
-        PlayerPrefs.SetInt("LevelComplete" + GameManager.CurrentLevelIndex.ToString(), 1);
+        //PlayerPrefs.SetInt("LevelComplete" + GameManager.CurrentLevelIndex.ToString(), 1);
     }
 
     void HidePanel(string aHideCompleteFunction)
@@ -40,7 +41,8 @@ public class LevelCompletePanel : Panel {
 
     public void NextLevel()
     {
-        HidePanel("OnHidingNextLevel");
+		panelAnimation.HidePanel("OnHidingNextLevel");
+        //HidePanel("OnHidingNextLevel");
     }
 
     void OnHidingNextLevel()
@@ -51,10 +53,11 @@ public class LevelCompletePanel : Panel {
 
     public void Quit()
     {
-        HidePanel("OnHidingQuit");
-    }
+		panelAnimation.HidePanel("OnHidingQuit");
+		//HidePanel("OnHidingQuit");
+	}
 
-    void OnHidingQuit()
+	void OnHidingQuit()
     {
         CanvasManager.OpenPanel(PanelEnum.LevelSelectPanel, panelType);
     }
