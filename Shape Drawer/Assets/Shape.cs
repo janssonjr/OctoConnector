@@ -24,6 +24,8 @@ public class Shape : MonoBehaviour {
     public SpriteRenderer spriteRenderer;
     public Rigidbody2D rb;
 
+	public ParticleSystem scoreParticles;
+
     Vector2 pauseVelocity;
     RectTransform collectable;
     Vector3 startPosition;
@@ -174,9 +176,14 @@ public class Shape : MonoBehaviour {
 		//myFlyAnimator.speed = 0f;
 		myFlyAnimator.enabled = false;
 		spriteRenderer.enabled = false;
-        ParticleSystem ps = collectable.GetChild(0).GetComponent<ParticleSystem>();
-        ps.gameObject.SetActive(true);
-        ps.Emit(100);
+		//ParticleSystem ps = collectable.GetChild(0).GetComponent<ParticleSystem>();
+		//ps.gameObject.SetActive(true);
+		//ps.Emit(100);
+		Vector3 newPosition = Camera.main.ScreenToWorldPoint(new Vector3(collectable.transform.position.x, collectable.transform.position.y, 0f));
+		newPosition.z = 0;
+		scoreParticles.transform.position = collectable.transform.position;
+		scoreParticles.gameObject.SetActive(true);
+		scoreParticles.Emit(100);
         SpawnerManager.Instance.ResetAllShapes();
         EventManager.Scored();
     }

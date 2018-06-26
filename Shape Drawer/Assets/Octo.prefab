@@ -314,6 +314,7 @@ MonoBehaviour:
   rightArm: {fileID: 1173892323557978}
   spriteRenderer: {fileID: 212280826412005540}
   rb: {fileID: 50763741995766254}
+  scoreParticles: {fileID: 0}
 --- !u!198 &198557840379608504
 ParticleSystem:
   m_ObjectHideFlags: 1
