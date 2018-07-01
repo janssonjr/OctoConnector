@@ -18,21 +18,21 @@ public class BackgroundColor : MonoBehaviour
 
     private void OnGameEvent(EventManager.GameEvent obj)
     {
-        switch(obj.myType)
-        {
-            case EventManager.GameEvent.EventType.Win:
-                Camera.main.backgroundColor = new Color(0f, 1f, 0f, 1f);
-                break;
-            case EventManager.GameEvent.EventType.Lose:
-                Camera.main.backgroundColor = new Color(1f, 0f, 0f, 1f);
-                break;
-            case EventManager.GameEvent.EventType.NewWave:
-                Camera.main.backgroundColor = new Color(1f, 1f, 1f, 1f);
-                break;
-            case EventManager.GameEvent.EventType.NextLevel:
-            case EventManager.GameEvent.EventType.StartGame:
-                Camera.main.backgroundColor = new Color(1f, 1f, 1f, 1f);
-                break;
-        }
+        //switch(obj.myType)
+        //{
+        //    case EventManager.GameEvent.EventType.Win:
+        //        Camera.main.backgroundColor = new Color(0f, 1f, 0f, 1f);
+        //        break;
+        //    case EventManager.GameEvent.EventType.Lose:
+        //        Camera.main.backgroundColor = new Color(1f, 0f, 0f, 1f);
+        //        break;
+        //    case EventManager.GameEvent.EventType.NewWave:
+        //        Camera.main.backgroundColor = new Color(1f, 1f, 1f, 1f);
+        //        break;
+        //    case EventManager.GameEvent.EventType.NextLevel:
+        //    case EventManager.GameEvent.EventType.StartGame:
+        //        Camera.main.backgroundColor = new Color(1f, 1f, 1f, 1f);
+        //        break;
+        //}
     }
 }

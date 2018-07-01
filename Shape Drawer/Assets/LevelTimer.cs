@@ -29,14 +29,6 @@ public class LevelTimer : MonoBehaviour, LevelCountDown<float>
 
 			switch (obj.myType)
 			{
-				case EventManager.GameEvent.EventType.NewWave:
-					break;
-				case EventManager.GameEvent.EventType.Win:
-					break;
-				case EventManager.GameEvent.EventType.Lose:
-					break;
-				case EventManager.GameEvent.EventType.ShapeReset:
-					break;
 				case EventManager.GameEvent.EventType.StartGame:
 					shouldCount = true;
 					break;
@@ -51,12 +43,6 @@ public class LevelTimer : MonoBehaviour, LevelCountDown<float>
 					break;
 				case EventManager.GameEvent.EventType.LevelComplete:
 					shouldCount = false;
-					break;
-				case EventManager.GameEvent.EventType.NextLevel:
-					break;
-				case EventManager.GameEvent.EventType.Scored:
-					break;
-				case EventManager.GameEvent.EventType.QuitGame:
 					break;
 				default:
 					break;

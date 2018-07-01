@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 public enum LevelType
 {
@@ -26,11 +27,44 @@ public class GameManager : MonoBehaviour
     public static LevelType levelType = LevelType.Length;
     public static int CurrentLevelIndex = 0;
     public static LevelsContainer Levels;
+	public int Goal
+	{
+		get
+		{
+			return goal;
+		}
+		private set
+		{
+			goal = value;
+			if(goal <= 0)
+			{
+				goal = 0;
+			}
+		}
+	}
+	public int MovesLeft
+	{
+		get
+		{
+			return movesLeft;
+		}
+		private set
+		{
+			movesLeft = value;
+			if(movesLeft <= 0)
+			{
+				movesLeft = 0;
+			}
+		}
+	}
+
 	public Transform[] transformPath;
 	public Vector3[] path;
-
-    int shapesReady;
-
+	public float delay = 0.3f;
+	public float tweenTime = 0.9f;
+	int shapesReady;
+	int movesLeft;
+	int goal;
     public static GameState myState = GameState.Length;
 
 
@@ -51,12 +85,10 @@ public class GameManager : MonoBehaviour
         instance = this;
         shapesReady = 0;
 		path = new Vector3[transformPath.Length];
-		//for(int i = 0; i < transformPath.Length; ++i)
-		//{
-		//	Vector3 newPosition = Camera.main.ScreenToWorldPoint(new Vector3(transformPath[i].transform.position.x, transformPath[i].transform.position.y, 0f));
-		//	path[i] = newPosition;
-		//	path[i].z = 0;
-		//}
+		for (int i = 0; i < transformPath.Length; ++i)
+		{
+			path[i] = transformPath[i].position;
+		}
 	}
 
     private void OnDisable()
@@ -75,6 +107,8 @@ public class GameManager : MonoBehaviour
                     CurrentLevelIndex = obj.myLevelData.LevelIndex;
                     myState = GameState.Playing;
                     shapesReady = 0;
+					Goal = obj.myLevelData.Goal;
+					MovesLeft = obj.myLevelData.Moves;
                     break;
                 }
             case EventManager.GameEvent.EventType.LevelComplete:
@@ -141,6 +175,68 @@ public class GameManager : MonoBehaviour
 
         }
     }
+
+	public void ShapeDrawn()
+	{
+		CheckForWinner();
+	}
+
+	void CheckForWinner()
+	{
+		switch (GetCurrentLevelType())
+		{
+			case LevelType.ConnecttAll:
+				DrawnAll();
+				break;
+			case LevelType.Timed:
+				DrawnAll();
+				break;
+		}
+	}
+
+	void DrawnAll()
+	{
+		SpawnerManager spawner = SpawnerManager.Instance;
+		int drawCount = spawner.shapeForced.Count(s => { return s.WasDrawn == true; });
+		if (drawCount == spawner.shapeForced.Count)
+		{
+			spawner.shapeForced.ForEach(s => { s.MoveToCenter(); });
+			WaveComplete();
+			//EventManager.Win(GetCurrentLevelType());
+		}
+	}
+
+	public void WaveFailed()
+	{
+		MovesLeft--;
+		if(MovesLeft <= 0 && myState != GameState.Won)
+		{
+			EventManager.GameOver();
+			CanvasManager.OpenPanel(PanelEnum.GameOverPanel);
+		}
+		else
+		{
+			EventManager.WaveFailed();
+		}
+	}
+
+	public void WaveComplete()
+	{
+		MovesLeft--;
+		Goal--;
+		EventManager.WaveComplete();
+		
+	}
+
+	public void CheckLevelComplete()
+	{
+		if (Goal <= 0)
+		{
+			myState = GameState.Won;
+			EventManager.LevelComplete();
+			CanvasManager.OpenPanel(PanelEnum.LevelComplete);
+		}
+	}
 }
 
 [System.Serializable]

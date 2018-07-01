@@ -5,7 +5,7 @@
       "LevelIndex": 0,
       "LevelType": 0,
       "Goal": 1,
-      "Moves": 10
+      "Moves": 1
     },
     {
       "LevelIndex": 1,
@@ -16,8 +16,8 @@
     {
       "LevelIndex": 2,
       "LevelType": 0,
-      "Goal": 5,
-      "Moves": 10
+      "Goal": 5000,
+      "Moves": 1000
     },
     {
       "LevelIndex": 3,

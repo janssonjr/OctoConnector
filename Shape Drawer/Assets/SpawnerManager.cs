@@ -39,12 +39,12 @@ public class SpawnerManager : MonoBehaviour {
         {
             case EventManager.GameEvent.EventType.NewWave:
                 break;
-            case EventManager.GameEvent.EventType.Win:
-                {
-                    //StartCoroutine(ResetShapesRoutine(1f));
-                    shouldCheckWinCondition = false;
-                }
-                break;
+            //case EventManager.GameEvent.EventType.Win:
+            //    {
+            //        //StartCoroutine(ResetShapesRoutine(1f));
+            //        shouldCheckWinCondition = false;
+            //    }
+                //break;
             case EventManager.GameEvent.EventType.StartGame:
                 {
                     Debug.Log("Starting Game");
@@ -73,6 +73,7 @@ public class SpawnerManager : MonoBehaviour {
                     isRunning = true;
                     collisionCount = 4;
                     StartCoroutine(AddForce());
+
                     break;
                 }
             case EventManager.GameEvent.EventType.ShapeReset:
@@ -83,7 +84,7 @@ public class SpawnerManager : MonoBehaviour {
                     break;
                 }
 			case EventManager.GameEvent.EventType.InkDone:
-				isRunning = true;
+					isRunning = true;
 				break;
         }
     }
@@ -102,21 +103,23 @@ public class SpawnerManager : MonoBehaviour {
         while (true)
         {
             yield return new WaitForSeconds(1f);
-			int range = UnityEngine.Random.Range(2, shapes.Count + 1);
+			int range = 2;// UnityEngine.Random.Range(2, shapes.Count + 1);
 
-            shapeForced.Clear();
-            EventManager.NewWave();
-            shouldCheckWinCondition = true;
-            Shuffle();
-            for (int i = 0; i < range; ++i)
-            {
-                //500 - 700
-                shapes[i].AddForce(Vector2.up * UnityEngine.Random.Range(500, 650));
-                shapeForced.Add(shapes[i].GetComponent<Shape>());
-                shapeForced[shapeForced.Count - 1].Launched();
+			if (GameManager.myState == GameState.Playing)
+			{
+				shapeForced.Clear();
+				EventManager.NewWave();
+				shouldCheckWinCondition = true;
+				Shuffle();
+				for (int i = 0; i < range; ++i)
+				{
+					//500 - 700
+					shapes[i].AddForce(Vector2.up * UnityEngine.Random.Range(500, 650));
+					shapeForced.Add(shapes[i].GetComponent<Shape>());
+					shapeForced[shapeForced.Count - 1].Launched();
 
-            }
-            Debug.Log("Adding force. "+ collisionCount.ToString() + " is colliding ");
+				}
+			}
             yield return new WaitForSeconds(1f);
             yield return new WaitUntil(() =>
             {
@@ -141,13 +144,14 @@ public class SpawnerManager : MonoBehaviour {
         if(collision.gameObject.layer == LayerMask.NameToLayer("Shape"))
         {
             collisionCount++;
-            Debug.Log("OnEnter: CollisionCount: " + collisionCount.ToString());
+            //Debug.Log("OnEnter: CollisionCount: " + collisionCount.ToString());
             Shape shapeToRemove = collision.gameObject.GetComponent<Shape>();
             if (shapeForced.Find(a => { return a == shapeToRemove; }) == null)
                 return;
             if (shapeToRemove.WasDrawn == false && shapeForced.Count > 0 && shouldCheckWinCondition == true)
             {
-                EventManager.Lose();
+				//EventManager.Lose();
+				GameManager.Instance.WaveFailed();
                 shouldCheckWinCondition = false;
 				isRunning = false;
                 StartCoroutine(ResetShapesRoutine(1f));
@@ -167,8 +171,10 @@ public class SpawnerManager : MonoBehaviour {
         foreach (var shape in shapes)
         {
             shape.bodyType = RigidbodyType2D.Dynamic;
-        }
-    }
+			Debug.Log("SpawnerManager.ResetShapes: Changing body type to static");
+
+		}
+	}
 
     public void ResetAllShapes()
     {
@@ -202,7 +208,7 @@ public class SpawnerManager : MonoBehaviour {
         {
             if(collisionCount > 0)
                 collisionCount--;
-            Debug.Log("OnExits: CollisionCount: " + collisionCount.ToString());
+            //Debug.Log("OnExits: CollisionCount: " + collisionCount.ToString());
         }
     }
 

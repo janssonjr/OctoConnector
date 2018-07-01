@@ -11,9 +11,9 @@ public class EventManager : MonoBehaviour {
     {
         public enum EventType
         {
-            NewWave,
-            Win, 
-            Lose,
+            NewWave, 
+           // Win, 
+            //Lose,
             ShapeReset,
             StartGame,
             PauseGame,
@@ -21,7 +21,8 @@ public class EventManager : MonoBehaviour {
             GameOver,
             LevelComplete,
 			NextLevel,
-            Scored,
+            WaveComplete,
+			WaveFailed,
             QuitGame,
 			InkDone
 		}
@@ -36,17 +37,17 @@ public class EventManager : MonoBehaviour {
             OnGameEvent.Invoke(new GameEvent { myType = GameEvent.EventType.NewWave});
     }
 
-    public static void Win(LevelType aLevelType)
-    {
-        if (OnGameEvent != null)
-            OnGameEvent.Invoke(new GameEvent { myType = GameEvent.EventType.Win, myLevelType = aLevelType });
-    }
+    //public static void Win(LevelType aLevelType)
+    //{
+    //    if (OnGameEvent != null)
+    //        OnGameEvent.Invoke(new GameEvent { myType = GameEvent.EventType.Win, myLevelType = aLevelType });
+    //}
 
-    public static void Lose()
-    {
-        if (OnGameEvent != null)
-            OnGameEvent.Invoke(new GameEvent { myType = GameEvent.EventType.Lose });
-    }
+    //public static void Lose()
+    //{
+    //    if (OnGameEvent != null)
+    //        OnGameEvent.Invoke(new GameEvent { myType = GameEvent.EventType.Lose });
+    //}
 
     public static void ShapeReset()
     {
@@ -90,11 +91,17 @@ public class EventManager : MonoBehaviour {
             OnGameEvent.Invoke(new GameEvent { myType = GameEvent.EventType.NextLevel, myLevelData = aLevelData });
     }
 
-    public static void Scored()
+    public static void WaveComplete()
     {
         if (OnGameEvent != null)
-            OnGameEvent.Invoke(new GameEvent { myType = GameEvent.EventType.Scored});
+            OnGameEvent.Invoke(new GameEvent { myType = GameEvent.EventType.WaveComplete});
     }
+
+	public static void WaveFailed()
+	{
+		if (OnGameEvent != null)
+			OnGameEvent.Invoke(new GameEvent { myType = GameEvent.EventType.WaveFailed });
+	}
 
 	public static void InkDone()
 	{

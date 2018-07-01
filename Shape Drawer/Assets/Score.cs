@@ -33,16 +33,16 @@ public class Score : MonoBehaviour {
 
     private void OnGameEvent(EventManager.GameEvent obj)
     {
-        if(obj.myType == EventManager.GameEvent.EventType.Win && myScoreType == ScoreType.Win)
-        {
-            myScore++;
-            UpdateText("Wins: ");
-        }
-        else if(obj.myType == EventManager.GameEvent.EventType.Lose && myScoreType == ScoreType.Lose)
-        {
-            myScore++;
-            UpdateText("Loses: ");
-        }
+        //if(obj.myType == EventManager.GameEvent.EventType.Win && myScoreType == ScoreType.Win)
+        //{
+        //    myScore++;
+        //    UpdateText("Wins: ");
+        //}
+        //else if(obj.myType == EventManager.GameEvent.EventType.Lose && myScoreType == ScoreType.Lose)
+        //{
+        //    myScore++;
+        //    UpdateText("Loses: ");
+        //}
     }
 
     void UpdateText(string aText)

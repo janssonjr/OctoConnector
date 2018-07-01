@@ -41,13 +41,13 @@ public class GamePanel : Panel {
 		{
 			case EventManager.GameEvent.EventType.NewWave:
 				break;
-			case EventManager.GameEvent.EventType.Win:
-				break;
-			case EventManager.GameEvent.EventType.Lose:
-				//iTween.ValueTo(inkSplat.gameObject, iTween.Hash("from", 0, "to", 1,"time", 0.01f, "oncomplete", "InkVisibleComplete", "oncompletetarget", gameObject, "onupdate", "UpdateInkColor", "onupdatetarget", gameObject));
-				inkSplat.color = new Color(1f, 1f, 1f, 1f);
-				InkVisibleComplete();
-				break;
+			//case EventManager.GameEvent.EventType.Win:
+			//	break;
+			//case EventManager.GameEvent.EventType.Lose:
+			//	//iTween.ValueTo(inkSplat.gameObject, iTween.Hash("from", 0, "to", 1,"time", 0.01f, "oncomplete", "InkVisibleComplete", "oncompletetarget", gameObject, "onupdate", "UpdateInkColor", "onupdatetarget", gameObject));
+			//	inkSplat.color = new Color(1f, 1f, 1f, 1f);
+			//	InkVisibleComplete();
+			//	break;
 			case EventManager.GameEvent.EventType.ShapeReset:
 				break;
 			case EventManager.GameEvent.EventType.StartGame:
@@ -65,8 +65,8 @@ public class GamePanel : Panel {
 				SetCountDownData();
 				SetCollectableData();
 				break;
-			case EventManager.GameEvent.EventType.Scored:
-				break;
+			//case EventManager.GameEvent.EventType.Scored:
+			//	break;
 			case EventManager.GameEvent.EventType.QuitGame:
 				break;
 			default:
@@ -76,7 +76,7 @@ public class GamePanel : Panel {
 
 	private void SetCollectableData()
 	{
-		collectables.connectAmount = myLevelData.Goal;
+		//collectables.connectAmount = myLevelData.Goal;
 		collectables.UpdateText();
 	}
 

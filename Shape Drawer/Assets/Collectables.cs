@@ -7,13 +7,13 @@ using UnityEngine.UI;
 public class Collectables : MonoBehaviour {
 
     public Text amountText;
-    public int connectAmount;
+    //public int connectAmount;
     public Image img;
 
     private void OnEnable()
     {
         EventManager.OnGameEvent += OnGameEvent;
-        connectAmount = 5;
+        //connectAmount = 5;
     }
 
     private void OnDisable()
@@ -25,12 +25,12 @@ public class Collectables : MonoBehaviour {
     {
         switch (obj.myType)
         {
-            case EventManager.GameEvent.EventType.Scored:
-                AddScore(GameManager.levelType);
-                break;
+            //case EventManager.GameEvent.EventType.Scored:
+            //    AddScore(GameManager.levelType);
+                //break;
             case EventManager.GameEvent.EventType.NextLevel:
             case EventManager.GameEvent.EventType.StartGame:
-                connectAmount = obj.myLevelData.Goal;
+                //connectAmount = obj.myLevelData.Goal;
                 UpdateText();
                 break;
             default:
@@ -43,11 +43,11 @@ public class Collectables : MonoBehaviour {
         switch (aLevelType)
         {
             case LevelType.ConnecttAll:
-                ReduceConnectGoal();
+                //ReduceConnectGoal();
                 UpdateText();
                 break;
             case LevelType.Timed:
-                ReduceConnectGoal();
+                //ReduceConnectGoal();
                 UpdateText();
                 break;
             case LevelType.ConnectAmount:
@@ -57,21 +57,21 @@ public class Collectables : MonoBehaviour {
         }
     }
 
-    private void ReduceConnectGoal()
-    {
-        connectAmount--;
-        if (connectAmount < 0)
-            connectAmount = 0;
-        if(connectAmount == 0)
-        {
-            GameManager.myState = GameState.Won;
-            EventManager.LevelComplete();
-            CanvasManager.OpenPanel(PanelEnum.LevelComplete);
-        }
-    }
+    //private void ReduceConnectGoal()
+    //{
+    //    connectAmount--;
+    //    if (connectAmount < 0)
+    //        connectAmount = 0;
+    //    if(connectAmount == 0)
+    //    {
+    //        GameManager.myState = GameState.Won;
+    //        EventManager.LevelComplete();
+    //        CanvasManager.OpenPanel(PanelEnum.LevelComplete);
+    //    }
+    //}
 
     public void UpdateText()
     {
-        amountText.text = connectAmount.ToString();
+        amountText.text = GameManager.Instance.Goal.ToString();
     }
 }

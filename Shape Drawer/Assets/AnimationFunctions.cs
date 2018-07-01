@@ -10,11 +10,21 @@ public class AnimationFunctions : MonoBehaviour
 
 	public void MovedToTarget()
 	{
-		shape.moveComplete();
+		//shape.moveComplete();
 		transform.localPosition = Vector3.zero;
 		transform.localRotation = Quaternion.identity;
 		transform.localScale = new Vector3(0.08f, 0.08f, 1f);
 		blastParticles.SetActive(false);
+	}
+
+	public void MoveToTargetDirty()
+	{
+
+	}
+
+	public void StartFly()
+	{
+		shape.StartFly();
 	}
 
 }

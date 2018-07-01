@@ -192,6 +192,8 @@ MonoBehaviour:
   - {fileID: 584215321}
   - {fileID: 717670707}
   path: []
+  delay: 0.6666667
+  tweenTime: 120
 --- !u!4 &29289391
 Transform:
   m_ObjectHideFlags: 0
@@ -4622,7 +4624,7 @@ ParticleSystem:
   moveWithTransform: 1
   moveWithCustomTransform: {fileID: 0}
   scalingMode: 0
-  randomSeed: -1637042550
+  randomSeed: 1962354503
   InitialModule:
     serializedVersion: 3
     enabled: 1
@@ -8265,7 +8267,7 @@ ParticleSystem:
   moveWithTransform: 0
   moveWithCustomTransform: {fileID: 0}
   scalingMode: 0
-  randomSeed: -437008943
+  randomSeed: 647249568
   InitialModule:
     serializedVersion: 3
     enabled: 1
@@ -16062,7 +16064,7 @@ ParticleSystem:
   moveWithTransform: 0
   moveWithCustomTransform: {fileID: 0}
   scalingMode: 0
-  randomSeed: 2085154610
+  randomSeed: -889673418
   InitialModule:
     serializedVersion: 3
     enabled: 1
@@ -24262,7 +24264,7 @@ Prefab:
     m_Modifications:
     - target: {fileID: 4964186371017970, guid: 86282cfb9860ca645a9a8410faac3647, type: 2}
       propertyPath: m_LocalPosition.x
-      value: 0.47
+      value: 0.52
       objectReference: {fileID: 0}
     - target: {fileID: 4964186371017970, guid: 86282cfb9860ca645a9a8410faac3647, type: 2}
       propertyPath: m_LocalPosition.y
@@ -24330,10 +24332,10 @@ RectTransform:
   m_Father: {fileID: 1652612730}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 996, y: 2048}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1756160141
 MonoBehaviour:
@@ -25286,7 +25288,7 @@ ParticleSystem:
   moveWithTransform: 1
   moveWithCustomTransform: {fileID: 0}
   scalingMode: 0
-  randomSeed: 12490839
+  randomSeed: -1181645894
   InitialModule:
     serializedVersion: 3
     enabled: 1

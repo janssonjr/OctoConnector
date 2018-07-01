@@ -2,24 +2,22 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 public class InputManager : MonoBehaviour {
 
     public SpawnerManager spawner;
-    //public ParticleSystem particles;
-    bool shouldCheckForWinner;
+    bool shouldCheckForInput;
     public CircleCollider2D circleCollider;
     public LineRenderer line;
     List<Vector3> taggedShapes = new List<Vector3>();
     List<LineRenderer> lines = new List<LineRenderer>();
-    bool isPaused;
+
     private void OnEnable()
     {
-        shouldCheckForWinner = true;
+        shouldCheckForInput = true;
         circleCollider.enabled = false;
         EventManager.OnGameEvent += OnGameEvent;
-        //line.positionCount = 0;
-        isPaused = false;
     }
 
     private void OnDisable()
@@ -32,23 +30,14 @@ public class InputManager : MonoBehaviour {
         switch(obj.myType)
         {
             case EventManager.GameEvent.EventType.StartGame:
-                shouldCheckForWinner = true;
+                shouldCheckForInput = true;
                 circleCollider.enabled = false;
-                isPaused = false;
                 break;
             case EventManager.GameEvent.EventType.NewWave:
                 {
-                    shouldCheckForWinner = true;
+                    shouldCheckForInput = true;
                     circleCollider.enabled = false;
                     taggedShapes.Clear();
-                    break;
-                }
-            case EventManager.GameEvent.EventType.Lose:
-                {
-                    shouldCheckForWinner = false;
-                    circleCollider.enabled = false;
-                    line.positionCount = 0;
-                    ResetLines();
                     break;
                 }
             case EventManager.GameEvent.EventType.ShapeReset:
@@ -57,23 +46,26 @@ public class InputManager : MonoBehaviour {
                     ResetLines();
                     break;
                 }
+			case EventManager.GameEvent.EventType.WaveComplete:
             case EventManager.GameEvent.EventType.GameOver:
             case EventManager.GameEvent.EventType.LevelComplete:
+				shouldCheckForInput = false;
+				ResetLines();
+				break;
             case EventManager.GameEvent.EventType.PauseGame:
                 {
-                    isPaused = true;
+					shouldCheckForInput = false;
                     break;
                 }
             case EventManager.GameEvent.EventType.ResumeGame:
                 {
-                    isPaused = false;
+					shouldCheckForInput = true;
                     break;
                 }
             case EventManager.GameEvent.EventType.NextLevel:
                 {
-                    isPaused = false;
                     taggedShapes.Clear();
-                    shouldCheckForWinner = true;
+                    shouldCheckForInput = true;
                     break;
                 }
         }
@@ -90,36 +82,15 @@ public class InputManager : MonoBehaviour {
 
     void Update ()
     {
-        if (isPaused == true)
+        if (shouldCheckForInput == false)
             return;
-        if (shouldCheckForWinner == false)
-            return;
-        int drawCount = 0;
-        if (spawner.shapeForced.Count > 0)
-        {
-            for (int i = 0; i < spawner.shapeForced.Count; ++i)
-            {
-                if (spawner.shapeForced[i].WasDrawn == true)
-                    drawCount++;
-            }
-            if (drawCount == spawner.shapeForced.Count)
-            {
-                shouldCheckForWinner = false;
-                
-                EventManager.Win(GameManager.GetCurrentLevelType());
-                line.positionCount = 0;
-                ResetLines();
-                //ResetLines();
-            }
-        }
+
         if (Input.GetMouseButton(0))
         {
-            //particles.gameObject.SetActive(true);
-            if(shouldCheckForWinner == true)
+            if(shouldCheckForInput == true)
             {
                 circleCollider.enabled = true;
                 Vector3 worldPoint = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-                //particles.transform.position = worldPoint;
                 Vector2 origin = new Vector2(worldPoint.x, worldPoint.y);
                 transform.position = origin;
                 if (lines.Count > 0)
@@ -129,7 +100,7 @@ public class InputManager : MonoBehaviour {
                     lines[lines.Count - 1].SetPosition(1, worldPoint);
                 }
             }
-            else if(shouldCheckForWinner == false && lines.Count > taggedShapes.Count)
+            else if(shouldCheckForInput == false && lines.Count > taggedShapes.Count)
             {
                 lines[lines.Count - 1].SetPosition(1, taggedShapes[taggedShapes.Count - 1]);
             }
@@ -138,9 +109,8 @@ public class InputManager : MonoBehaviour {
         }
         else if(Input.GetMouseButtonUp(0))
         {
-            //particles.gameObject.SetActive(false);
             circleCollider.enabled = false;
-            if (shouldCheckForWinner == true)
+            if (shouldCheckForInput == true)
             {
                 if (spawner.shapeForced.Count > 0)
                 {
@@ -148,10 +118,10 @@ public class InputManager : MonoBehaviour {
                     {
                         shape.WasDrawn = false;
                         shape.canBePressed = true;
-                        //shape.GetComponent<SpriteRenderer>().color = new Color(0f, 0f, 0f);
                         shape.rb.bodyType = RigidbodyType2D.Dynamic;
-                    }
-                }
+						Debug.Log("InputManager.Update.MouseButtonUp: Changing body type to dynamic");
+					}
+				}
             }
             ResetLines();
         }
@@ -162,7 +132,7 @@ public class InputManager : MonoBehaviour {
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (isPaused == true)
+        if (shouldCheckForInput == false)
             return;
         if (collision.gameObject.layer == LayerMask.NameToLayer("Shape"))
         {
@@ -172,6 +142,7 @@ public class InputManager : MonoBehaviour {
             {
                 shape.OnPressed();
                 shape.rb.bodyType = RigidbodyType2D.Static;
+				Debug.Log("InputManager.OnTriggerEnter2D: Changing body type to static");
                 taggedShapes.Add(collision.transform.position);
                 if(lines.Count > 0)
                 {
@@ -185,10 +156,9 @@ public class InputManager : MonoBehaviour {
                     lines[lines.Count - 1].positionCount = 1;
                     lines[lines.Count - 1].SetPosition(0, new Vector3(shape.transform.position.x, shape.transform.position.y, 0));
                 }
+				GameManager.Instance.ShapeDrawn();
             }
-            //collision.gameObject.GetComponent<SpriteRenderer>().color = new Color(0f, 0f, 1f);
-            //line.positionCount = taggedShapes.Count;
-            //line.SetPosition(taggedShapes.Count - 1, collision.transform.position);
         }
     }
 }
+
