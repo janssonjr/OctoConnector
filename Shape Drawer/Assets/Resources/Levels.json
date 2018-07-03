@@ -26,10 +26,16 @@
       "Moves": 15
     },
     {
-      "LevelIndex":4,
+      "LevelIndex": 4,
       "LevelType": 1,
       "Goal": 7,
       "Time": 80
+    },
+    {
+      "LevelIndex":5,
+      "LevelType": 2,
+      "Goal": 10,
+      "Moves": 20
     }
   ]
 }

@@ -39,39 +39,42 @@ public class GamePanel : Panel {
 	{
 		switch (obj.myType)
 		{
-			case EventManager.GameEvent.EventType.NewWave:
-				break;
-			//case EventManager.GameEvent.EventType.Win:
-			//	break;
-			//case EventManager.GameEvent.EventType.Lose:
-			//	//iTween.ValueTo(inkSplat.gameObject, iTween.Hash("from", 0, "to", 1,"time", 0.01f, "oncomplete", "InkVisibleComplete", "oncompletetarget", gameObject, "onupdate", "UpdateInkColor", "onupdatetarget", gameObject));
-			//	inkSplat.color = new Color(1f, 1f, 1f, 1f);
-			//	InkVisibleComplete();
-			//	break;
-			case EventManager.GameEvent.EventType.ShapeReset:
-				break;
-			case EventManager.GameEvent.EventType.StartGame:
-				break;
-			case EventManager.GameEvent.EventType.PauseGame:
-				break;
-			case EventManager.GameEvent.EventType.ResumeGame:
-				break;
-			case EventManager.GameEvent.EventType.GameOver:
-				break;
-			case EventManager.GameEvent.EventType.LevelComplete:
-				break;
 			case EventManager.GameEvent.EventType.NextLevel:
 				myLevelData = obj.myLevelData;
 				SetCountDownData();
 				SetCollectableData();
 				break;
-			//case EventManager.GameEvent.EventType.Scored:
-			//	break;
+			case EventManager.GameEvent.EventType.WaveFailed:
+				{
+
+				}
+				inkSplat.color = new Color(1f, 1f, 1f, 1f);
+				InkVisibleComplete();
+				break;
 			case EventManager.GameEvent.EventType.QuitGame:
 				break;
 			default:
 				break;
 		}
+	}
+
+	bool ShouldShowInk()
+	{
+		LevelType levelType = GameManager.GetCurrentLevelType();
+		switch (levelType)
+		{
+			case LevelType.ConnecttAllMoves:
+				return true;
+			case LevelType.ConnectAllTimed:
+				return true;
+			case LevelType.ConnectAmountMoves:
+				return false;
+			case LevelType.ConnectAmountTime:
+				return false;
+			case LevelType.ConnectColor:
+				break;
+		}
+		return true;
 	}
 
 	private void SetCollectableData()
@@ -87,15 +90,17 @@ public class GamePanel : Panel {
 		movesLeft.gameObject.SetActive(false);
 		switch (levelType)
 		{
-			case LevelType.ConnecttAll:
+			case LevelType.ConnecttAllMoves:
 				movesLeft.gameObject.SetActive(true);
 				movesLeft.SetCountDownData(myLevelData.Moves);
 				break;
-			case LevelType.Timed:
+			case LevelType.ConnectAllTimed:
 				levelTimer.gameObject.SetActive(true);
 				levelTimer.SetCountDownData(myLevelData.Time);
 				break;
-			case LevelType.ConnectAmount:
+			case LevelType.ConnectAmountMoves:
+				movesLeft.gameObject.SetActive(true);
+				movesLeft.SetCountDownData(myLevelData.Moves);
 				break;
 			default:
 				break;
@@ -121,8 +126,17 @@ public class GamePanel : Panel {
 
 	public void InkVisibleComplete()
 	{
-		//iTween.ColorTo(inkSplat.gameObject, iTween.Hash("a", 0, "time", 0.5f, "delay", 0.5f, "oncomplete", "InkInvisibleComplete", "oncompletetarget", gameObject));
-		iTween.ValueTo(inkSplat.gameObject, iTween.Hash("from", 1, "to", 0,"time", 0.5f, "delay", 0.5f, "oncomplete", "InkInvisibleComplete", "oncompletetarget", gameObject, "onupdate", "UpdateInkColor", "onupdatetarget", gameObject));
+		Hashtable table = new Hashtable();
+		table.Add("from", 1);
+		table.Add("to", 0);
+		table.Add("time", 0.5f);
+		table.Add("delay", 0.5f);
+		table.Add("oncomplete", "InkInvisibleComplete");
+		table.Add("oncompletetarget", gameObject);
+		table.Add("onupdate", "UpdateInkColor");
+		table.Add("onupdatetarget", gameObject);
+
+		iTween.ValueTo(inkSplat.gameObject, table);
 
 	}
 

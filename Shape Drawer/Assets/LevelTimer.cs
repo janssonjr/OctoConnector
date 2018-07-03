@@ -24,7 +24,7 @@ public class LevelTimer : MonoBehaviour, LevelCountDown<float>
 
 	private void OnGameEvent(EventManager.GameEvent obj)
 	{
-		if (GameManager.GetCurrentLevelType() == LevelType.Timed)
+		if (GameManager.GetCurrentLevelType() == LevelType.ConnectAllTimed)
 		{
 
 			switch (obj.myType)

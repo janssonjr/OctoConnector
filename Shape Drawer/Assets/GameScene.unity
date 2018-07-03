@@ -24491,7 +24491,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   amountText: {fileID: 948619358}
-  connectAmount: 0
   img: {fileID: 1650732739}
 --- !u!1 &1815339298
 GameObject:

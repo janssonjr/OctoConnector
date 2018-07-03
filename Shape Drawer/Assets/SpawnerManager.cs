@@ -103,7 +103,7 @@ public class SpawnerManager : MonoBehaviour {
         while (true)
         {
             yield return new WaitForSeconds(1f);
-			int range = 2;// UnityEngine.Random.Range(2, shapes.Count + 1);
+			int range = UnityEngine.Random.Range(2, shapes.Count + 1);
 
 			if (GameManager.myState == GameState.Playing)
 			{
@@ -148,9 +148,9 @@ public class SpawnerManager : MonoBehaviour {
             Shape shapeToRemove = collision.gameObject.GetComponent<Shape>();
             if (shapeForced.Find(a => { return a == shapeToRemove; }) == null)
                 return;
-            if (shapeToRemove.WasDrawn == false && shapeForced.Count > 0 && shouldCheckWinCondition == true)
+            if (shapeToRemove.WasDrawn == false && shapeForced.Count > 0
+				&& shouldCheckWinCondition == true && GameManager.currentWaveState != GameState.Won)
             {
-				//EventManager.Lose();
 				GameManager.Instance.WaveFailed();
                 shouldCheckWinCondition = false;
 				isRunning = false;
@@ -178,9 +178,10 @@ public class SpawnerManager : MonoBehaviour {
 
     public void ResetAllShapes()
     {
+		RemoveShapeTween();
+        ResetShapesPosition();
         ResetShapes();
         SetShapesActive();
-        ResetShapesPosition();
 		ResetShapesRotation();
 		ResetShapeScale();
     }
@@ -216,8 +217,17 @@ public class SpawnerManager : MonoBehaviour {
     {
         foreach (var s in shapes)
         {
-            Shape shape = s.GetComponentInParent<Shape>();
+            Shape shape = s.GetComponent<Shape>();
             shape.ResetPosition();
         }
     }
+
+	void RemoveShapeTween()
+	{
+		foreach (var s in shapes)
+		{
+			Shape shape = s.GetComponent<Shape>();
+			shape.RemoveTween();
+		}
+	}
 }

@@ -112,22 +112,54 @@ public class InputManager : MonoBehaviour {
             circleCollider.enabled = false;
             if (shouldCheckForInput == true)
             {
-                if (spawner.shapeForced.Count > 0)
-                {
-                    foreach (var shape in spawner.shapeForced)
-                    {
-                        shape.WasDrawn = false;
-                        shape.canBePressed = true;
-                        shape.rb.bodyType = RigidbodyType2D.Dynamic;
-						Debug.Log("InputManager.Update.MouseButtonUp: Changing body type to dynamic");
-					}
-				}
+				WinType();
+                
             }
             ResetLines();
         }
+	}
 
-        
-        
+	void WinType()
+	{
+		switch (GameManager.GetCurrentLevelType())
+		{
+			case LevelType.ConnecttAllMoves:
+				ConnectAll();
+				break;
+			case LevelType.ConnectAllTimed:
+				ConnectAll();
+				break;
+			case LevelType.ConnectAmountMoves:
+				ConnectAmount();
+				break;
+			case LevelType.ConnectAmountTime:
+				break;
+			case LevelType.ConnectColor:
+				break;
+		}
+	}
+
+	void ConnectAll()
+	{
+		if (spawner.shapeForced.Count > 0)
+		{
+			foreach (var shape in spawner.shapeForced)
+			{
+				shape.WasDrawn = false;
+				shape.canBePressed = true;
+				shape.rb.bodyType = RigidbodyType2D.Dynamic;
+			}
+		}
+	}
+
+	void ConnectAmount()
+	{
+		int amount = spawner.shapeForced.Count(s => { return s.WasDrawn == true; });
+		if(amount > 0)
+		{
+			GameManager.Instance.ShapeReadyGoal = amount;
+			GameManager.Instance.ShapeDrawn();
+		}
 	}
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -142,7 +174,6 @@ public class InputManager : MonoBehaviour {
             {
                 shape.OnPressed();
                 shape.rb.bodyType = RigidbodyType2D.Static;
-				Debug.Log("InputManager.OnTriggerEnter2D: Changing body type to static");
                 taggedShapes.Add(collision.transform.position);
                 if(lines.Count > 0)
                 {
@@ -156,8 +187,21 @@ public class InputManager : MonoBehaviour {
                     lines[lines.Count - 1].positionCount = 1;
                     lines[lines.Count - 1].SetPosition(0, new Vector3(shape.transform.position.x, shape.transform.position.y, 0));
                 }
-				GameManager.Instance.ShapeDrawn();
-            }
+				LevelType levelType = GameManager.GetCurrentLevelType();
+				if (levelType == LevelType.ConnecttAllMoves || levelType == LevelType.ConnectAllTimed)
+				{
+					GameManager.Instance.ShapeDrawn();
+				}
+				else
+				{
+					int count = spawner.shapeForced.Count(s => { return s.WasDrawn == true; });
+					if (count == spawner.shapeForced.Count)
+					{
+						GameManager.Instance.ShapeReadyGoal = count;
+						GameManager.Instance.ShapeDrawn();
+					}
+				}
+			}
         }
     }
 }

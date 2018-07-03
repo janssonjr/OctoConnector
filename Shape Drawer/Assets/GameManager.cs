@@ -6,9 +6,11 @@ using System.Linq;
 
 public enum LevelType
 {
-    ConnecttAll,
-    Timed,
-    ConnectAmount,
+    ConnecttAllMoves,
+    ConnectAllTimed,
+    ConnectAmountMoves,
+	ConnectAmountTime,
+	ConnectColor,
 
     Length
 }
@@ -63,12 +65,20 @@ public class GameManager : MonoBehaviour
 	public float delay = 0.3f;
 	public float tweenTime = 0.9f;
 	int shapesReady;
+	int shapesReadyGoal;
 	int movesLeft;
 	int goal;
+	bool hasScoredThisWave;
     public static GameState myState = GameState.Length;
+	public static GameState currentWaveState = GameState.Length;
 
+	public int ShapeReadyGoal
+	{
+		set { shapesReadyGoal = value; }
+		get { return shapesReadyGoal; }
+	}
 
-    private static GameManager instance = null;
+	private static GameManager instance = null;
 
     public static GameManager Instance
     {
@@ -89,6 +99,7 @@ public class GameManager : MonoBehaviour
 		{
 			path[i] = transformPath[i].position;
 		}
+		hasScoredThisWave = false;
 	}
 
     private void OnDisable()
@@ -109,6 +120,8 @@ public class GameManager : MonoBehaviour
                     shapesReady = 0;
 					Goal = obj.myLevelData.Goal;
 					MovesLeft = obj.myLevelData.Moves;
+					currentWaveState = GameState.Playing;
+					hasScoredThisWave = false;
                     break;
                 }
             case EventManager.GameEvent.EventType.LevelComplete:
@@ -119,6 +132,7 @@ public class GameManager : MonoBehaviour
             case EventManager.GameEvent.EventType.NewWave:
                 {
                     shapesReady = 0;
+					hasScoredThisWave = false;
                     break;
                 }
         }
@@ -158,23 +172,52 @@ public class GameManager : MonoBehaviour
     public void ShapeReady()
     {
         shapesReady++;
-        if(shapesReady == SpawnerManager.Instance.shapeForced.Count)
-        {
-            var shapedForced = SpawnerManager.Instance.shapeForced;
-            for (int i = 0; i < shapedForced.Count; ++i)
-            {
-                if(i == 0)
-                {
-                    shapedForced[i].MoveToTarget();
-                }
-                else
-                {
-                    shapedForced[i].gameObject.SetActive(false);
-                }
-            }
-
-        }
+		switch(GetCurrentLevelType())
+		{
+			case LevelType.ConnecttAllMoves:
+			case LevelType.ConnectAllTimed:
+				ShapeReadyAll();
+				break;
+			case LevelType.ConnectAmountMoves:
+			case LevelType.ConnectAmountTime:
+				ShapeReadyAmount();
+				break;
+		}
     }
+
+	void ShapeReadyAll()
+	{
+		if (shapesReady == SpawnerManager.Instance.shapeForced.Count && hasScoredThisWave == false)
+		{
+			var shapedForced = SpawnerManager.Instance.shapeForced;
+			ShapeReady(shapedForced);
+		}
+	}
+
+	void ShapeReadyAmount()
+	{
+		if (shapesReady > 0 && hasScoredThisWave == false)
+		{
+			var shapesReady = SpawnerManager.Instance.shapeForced.FindAll(s => { return s.WasDrawn == true; });
+			ShapeReady(shapesReady);	
+		}
+	}
+
+	void ShapeReady(List<Shape> aShapeList)
+	{
+		for (int i = 0; i < aShapeList.Count; ++i)
+		{
+			if (i == 0)
+			{
+				aShapeList[i].MoveToTarget();
+				hasScoredThisWave = true;
+			}
+			else
+			{
+				aShapeList[i].gameObject.SetActive(false);
+			}
+		}
+	}
 
 	public void ShapeDrawn()
 	{
@@ -183,14 +226,34 @@ public class GameManager : MonoBehaviour
 
 	void CheckForWinner()
 	{
-		switch (GetCurrentLevelType())
+		if (currentWaveState == GameState.Playing)
 		{
-			case LevelType.ConnecttAll:
-				DrawnAll();
-				break;
-			case LevelType.Timed:
-				DrawnAll();
-				break;
+			switch (GetCurrentLevelType())
+			{
+				case LevelType.ConnecttAllMoves:
+					DrawnAll();
+					break;
+				case LevelType.ConnectAllTimed:
+					DrawnAll();
+					break;
+				case LevelType.ConnectAmountMoves:
+					CountDrawnShapes();
+					break;
+			}
+		}
+	}
+
+	void CountDrawnShapes()
+	{
+		SpawnerManager spawner = SpawnerManager.Instance;
+		int drawCount = spawner.shapeForced.Count(s => { return s.WasDrawn == true; });
+		if (drawCount > 0 && drawCount == shapesReadyGoal)
+		{
+			currentWaveState = GameState.Won;
+			spawner.shapeForced.ForEach(s => { if(s.WasDrawn) s.MoveToCenter(); });
+			Goal -= drawCount;
+			MovesLeft--;
+			EventManager.WaveComplete();
 		}
 	}
 
@@ -209,6 +272,7 @@ public class GameManager : MonoBehaviour
 	public void WaveFailed()
 	{
 		MovesLeft--;
+		currentWaveState = GameState.Lose;
 		if(MovesLeft <= 0 && myState != GameState.Won)
 		{
 			EventManager.GameOver();
@@ -222,6 +286,7 @@ public class GameManager : MonoBehaviour
 
 	public void WaveComplete()
 	{
+		currentWaveState = GameState.Playing;
 		MovesLeft--;
 		Goal--;
 		EventManager.WaveComplete();

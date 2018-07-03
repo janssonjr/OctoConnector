@@ -30,6 +30,7 @@ public class Collectables : MonoBehaviour {
                 //break;
             case EventManager.GameEvent.EventType.NextLevel:
             case EventManager.GameEvent.EventType.StartGame:
+			case EventManager.GameEvent.EventType.WaveComplete:
                 //connectAmount = obj.myLevelData.Goal;
                 UpdateText();
                 break;
@@ -42,15 +43,16 @@ public class Collectables : MonoBehaviour {
     {
         switch (aLevelType)
         {
-            case LevelType.ConnecttAll:
+            case LevelType.ConnecttAllMoves:
                 //ReduceConnectGoal();
                 UpdateText();
                 break;
-            case LevelType.Timed:
+            case LevelType.ConnectAllTimed:
                 //ReduceConnectGoal();
                 UpdateText();
                 break;
-            case LevelType.ConnectAmount:
+            case LevelType.ConnectAmountMoves:
+				UpdateText();
                 break;
             default:
                 break;

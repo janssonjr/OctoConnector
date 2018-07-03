@@ -12,7 +12,7 @@ public class LevelData
     {
         get
         {
-            return LevelType == LevelType.Timed;
+            return LevelType == LevelType.ConnectAllTimed;
         }
     }
 }

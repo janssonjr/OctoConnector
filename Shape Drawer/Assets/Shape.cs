@@ -30,6 +30,8 @@ public class Shape : MonoBehaviour {
     RectTransform collectable;
     Vector3 startPosition;
 
+	const string MoveToCenterTweenName = "MoveToCenter";
+
     private void Awake()
     {
         startPosition = transform.position;
@@ -76,7 +78,8 @@ public class Shape : MonoBehaviour {
 				"position", GameManager.Instance.transformPath[0].position,
 				"time", 1f,
 				"oncompletetarget", GameManager.Instance.gameObject,
-				"oncomplete", "ShapeReady"
+				"oncomplete", "ShapeReady",
+				"name", MoveToCenterTweenName
 				));
 		}
 	}
@@ -174,10 +177,17 @@ public class Shape : MonoBehaviour {
 		GetComponentInChildren<AnimationFunctions>().MovedToTarget();
 		myStage = SpriteStage.Up;
 		UpdateSprite();
+		Debug.Break();
 	}
 
-    internal void ResetPosition()
+    public void ResetPosition()
     {
         transform.position = startPosition;
+		Debug.Log("Reseting position");
     }
+
+	public void RemoveTween()
+	{
+		iTween.StopByName(gameObject, MoveToCenterTweenName);
+	}
 }
