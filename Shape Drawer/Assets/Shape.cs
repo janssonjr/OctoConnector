@@ -3,6 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
+using DG.Tweening.Plugins.Options;
+using DG.Tweening.Plugins.Core.PathCore;
+using DG.Tweening.Core;
 
 public enum SpriteStage
 {
@@ -30,7 +33,9 @@ public class Shape : MonoBehaviour {
     Vector2 pauseVelocity;
     RectTransform collectable;
     Vector3 startPosition;
-
+	//TweenerCore<Vector3, Path, PathOptions> flyTween;
+	Sequence flySequence;
+	int flyPathIndex = 0;
 	const string MoveToCenterTweenName = "MoveToCenter";
 
     private void Awake()
@@ -151,12 +156,21 @@ public class Shape : MonoBehaviour {
 		path[3] = collectable.transform.position;//Camera.main.ScreenToWorldPoint(new Vector3(collectable.transform.position.x, collectable.transform.position.y, 0f));
 		path[2].x = ((path[3] - transform.position) / 2 + path[1]).x;
 		//path[1].x = ((path[2] - transform.position) /	2 + path[0]).x;
-
-		transform.DOPath(path, GameManager.Instance.tweenTime, PathType.CatmullRom, PathMode.Sidescroller2D)
+		GameManager.Instance.path = path;
+		flySequence = DOTween.Sequence();
+		flySequence.Append(transform.DOPath(path, 1, PathType.CatmullRom, PathMode.Sidescroller2D)
 			.SetDelay(GameManager.Instance.delay)
 			.OnComplete(moveComplete)
-			.SetSpeedBased(true)
-			.SetEase(Ease.Linear);
+			//.SetSpeedBased(true)
+			.SetEase(Ease.Linear));
+		flySequence.Join(transform.DORotate(new Vector3(0, 0, -140f), 0.5f).SetSpeedBased());
+		//flyTween = transform.DOPath(path, GameManager.Instance.tweenTime, PathType.CatmullRom, PathMode.Sidescroller2D)
+		//	.SetDelay(GameManager.Instance.delay)
+		//	.OnComplete(moveComplete)
+		//	.SetSpeedBased(true)
+		//	.SetEase(Ease.Linear)
+		//	.OnWaypointChange(OnWaypointChange);
+
 		//iTween.MoveTo(gameObject, iTween.Hash(
 		//	"path", path,
 		//	"islocal", false,
@@ -167,8 +181,15 @@ public class Shape : MonoBehaviour {
 		//	));
 		//Debug.Break();
 	}
-	
-    public void moveComplete()
+
+	private void OnWaypointChange(int value)
+	{
+		//if(value < 3)
+		//	flyTween.SetLookAt(GameManager.Instance.path[value + 1]);
+		Debug.Log("Next waypoint index: " + value);
+	}
+
+	public void moveComplete()
     {
 		myFlyAnimator.enabled = false;
 		spriteRenderer.enabled = false;
