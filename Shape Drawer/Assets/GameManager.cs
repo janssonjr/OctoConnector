@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using DG.Tweening;
 
 public enum LevelType
 {
@@ -88,7 +89,12 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private void OnEnable()
+	private void Awake()
+	{
+		DOTween.Init();
+	}
+
+	private void OnEnable()
     {
         CreateLevelData();
         EventManager.OnGameEvent += OnGameEvent;
@@ -133,6 +139,7 @@ public class GameManager : MonoBehaviour
                 {
                     shapesReady = 0;
 					hasScoredThisWave = false;
+					currentWaveState = GameState.Playing;
                     break;
                 }
         }
@@ -261,6 +268,7 @@ public class GameManager : MonoBehaviour
 	{
 		SpawnerManager spawner = SpawnerManager.Instance;
 		int drawCount = spawner.shapeForced.Count(s => { return s.WasDrawn == true; });
+		Debug.Log("DrawCount: " + drawCount.ToString());
 		if (drawCount == spawner.shapeForced.Count)
 		{
 			spawner.shapeForced.ForEach(s => { s.MoveToCenter(); });

@@ -171,7 +171,7 @@ public class SpawnerManager : MonoBehaviour {
         foreach (var shape in shapes)
         {
             shape.bodyType = RigidbodyType2D.Dynamic;
-			Debug.Log("SpawnerManager.ResetShapes: Changing body type to static");
+			//Debug.Log("SpawnerManager.ResetShapes: Changing body type to static");
 
 		}
 	}

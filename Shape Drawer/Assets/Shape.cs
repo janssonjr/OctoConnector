@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using DG.Tweening;
 
 public enum SpriteStage
 {
@@ -149,18 +150,24 @@ public class Shape : MonoBehaviour {
 		var path = GameManager.Instance.path;
 		path[3] = collectable.transform.position;//Camera.main.ScreenToWorldPoint(new Vector3(collectable.transform.position.x, collectable.transform.position.y, 0f));
 		path[2].x = ((path[3] - transform.position) / 2 + path[1]).x;
+		//path[1].x = ((path[2] - transform.position) /	2 + path[0]).x;
 
-		iTween.MoveTo(gameObject, iTween.Hash(
-			"path", path,
-			"islocal", false,
-			"speed", GameManager.Instance.tweenTime,
-			"delay", GameManager.Instance.delay,
-			"easeype", iTween.EaseType.linear,
-			"oncomplete", "moveComplete"
-			));
+		transform.DOPath(path, GameManager.Instance.tweenTime, PathType.CatmullRom, PathMode.Sidescroller2D)
+			.SetDelay(GameManager.Instance.delay)
+			.OnComplete(moveComplete)
+			.SetSpeedBased(true)
+			.SetEase(Ease.Linear);
+		//iTween.MoveTo(gameObject, iTween.Hash(
+		//	"path", path,
+		//	"islocal", false,
+		//	"speed", GameManager.Instance.tweenTime,
+		//	"delay", GameManager.Instance.delay,
+		//	"easeype", iTween.EaseType.linear,
+		//	"oncomplete", "moveComplete"
+		//	));
 		//Debug.Break();
 	}
-
+	
     public void moveComplete()
     {
 		myFlyAnimator.enabled = false;
@@ -177,7 +184,6 @@ public class Shape : MonoBehaviour {
 		GetComponentInChildren<AnimationFunctions>().MovedToTarget();
 		myStage = SpriteStage.Up;
 		UpdateSprite();
-		Debug.Break();
 	}
 
     public void ResetPosition()
