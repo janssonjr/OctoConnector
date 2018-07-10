@@ -45,9 +45,6 @@ public class GamePanel : Panel {
 				SetCollectableData();
 				break;
 			case EventManager.GameEvent.EventType.WaveFailed:
-				{
-
-				}
 				inkSplat.color = new Color(1f, 1f, 1f, 1f);
 				InkVisibleComplete();
 				break;

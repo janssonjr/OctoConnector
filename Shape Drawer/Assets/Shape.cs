@@ -64,6 +64,8 @@ public class Shape : MonoBehaviour {
 		else if (obj.myType == EventManager.GameEvent.EventType.ResumeGame)
 		{
 			rb.bodyType = RigidbodyType2D.Dynamic;
+			Debug.Log("Shape.onGameEvent: Changing " + gameObject.name+ "to dynamic");
+
 			rb.velocity = pauseVelocity;
 		}
 		else if (obj.myType == EventManager.GameEvent.EventType.NewWave)
@@ -124,7 +126,8 @@ public class Shape : MonoBehaviour {
         WasDrawn = true;
         canBePressed = false;
         myStage = SpriteStage.Connecting;
-
+		rb.bodyType = RigidbodyType2D.Static;
+		Debug.Log("Shape.OnPressed: Changing "+gameObject.name+" to static!");
         UpdateSprite();
 		myConnectingAnimator.enabled = true;
 
@@ -182,23 +185,12 @@ public class Shape : MonoBehaviour {
 		//Debug.Break();
 	}
 
-	private void OnWaypointChange(int value)
-	{
-		//if(value < 3)
-		//	flyTween.SetLookAt(GameManager.Instance.path[value + 1]);
-		Debug.Log("Next waypoint index: " + value);
-	}
-
 	public void moveComplete()
     {
 		myFlyAnimator.enabled = false;
 		spriteRenderer.enabled = false;
 
-		Vector3 newPosition = Camera.main.ScreenToWorldPoint(new Vector3(collectable.transform.position.x, collectable.transform.position.y, 0f));
-		newPosition.z = 0;
-		scoreParticles.transform.position = collectable.transform.position;
-		scoreParticles.gameObject.SetActive(true);
-		scoreParticles.Emit(100);
+		EmitScoreParticles();
         SpawnerManager.Instance.ResetAllShapes();
 		//EventManager.WaveComplete();
 		GameManager.Instance.CheckLevelComplete();
@@ -207,10 +199,16 @@ public class Shape : MonoBehaviour {
 		UpdateSprite();
 	}
 
+	void EmitScoreParticles()
+	{
+		scoreParticles.transform.position = collectable.transform.position;
+		scoreParticles.gameObject.SetActive(true);
+		scoreParticles.Emit(100);
+	}
+
     public void ResetPosition()
     {
         transform.position = startPosition;
-		Debug.Log("Reseting position");
     }
 
 	public void RemoveTween()

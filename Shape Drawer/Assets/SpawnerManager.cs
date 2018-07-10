@@ -105,7 +105,7 @@ public class SpawnerManager : MonoBehaviour {
             yield return new WaitForSeconds(1f);
 			int range = UnityEngine.Random.Range(2, shapes.Count + 1);
 
-			if (GameManager.myState == GameState.Playing)
+			if (GameManager.myLevelState == GameState.Playing)
 			{
 				shapeForced.Clear();
 				EventManager.NewWave();
@@ -144,12 +144,12 @@ public class SpawnerManager : MonoBehaviour {
         if(collision.gameObject.layer == LayerMask.NameToLayer("Shape"))
         {
             collisionCount++;
-            //Debug.Log("OnEnter: CollisionCount: " + collisionCount.ToString());
+            Debug.Log("OnEnter: CollisionCount: " + collisionCount.ToString());
             Shape shapeToRemove = collision.gameObject.GetComponent<Shape>();
             if (shapeForced.Find(a => { return a == shapeToRemove; }) == null)
                 return;
             if (shapeToRemove.WasDrawn == false && shapeForced.Count > 0
-				&& shouldCheckWinCondition == true && GameManager.currentWaveState != GameState.Won)
+				&& shouldCheckWinCondition == true && GameManager.myWaveState != GameState.Won)
             {
 				GameManager.Instance.WaveFailed();
                 shouldCheckWinCondition = false;
@@ -171,7 +171,7 @@ public class SpawnerManager : MonoBehaviour {
         foreach (var shape in shapes)
         {
             shape.bodyType = RigidbodyType2D.Dynamic;
-			//Debug.Log("SpawnerManager.ResetShapes: Changing body type to static");
+			Debug.Log("SpawnerManager.ResetShapes: Changing "+shape.gameObject.name+" to dynamic");
 
 		}
 	}
@@ -209,7 +209,7 @@ public class SpawnerManager : MonoBehaviour {
         {
             if(collisionCount > 0)
                 collisionCount--;
-            //Debug.Log("OnExits: CollisionCount: " + collisionCount.ToString());
+            Debug.Log("OnExits: CollisionCount: " + collisionCount.ToString());
         }
     }
 

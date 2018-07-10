@@ -24,7 +24,8 @@ public class EventManager : MonoBehaviour {
             WaveComplete,
 			WaveFailed,
             QuitGame,
-			InkDone
+			InkDone,
+			PreScore
 		}
         public LevelType myLevelType;
         public EventType myType;
@@ -107,5 +108,11 @@ public class EventManager : MonoBehaviour {
 	{
 		if (OnGameEvent != null)
 			OnGameEvent.Invoke(new GameEvent { myType = GameEvent.EventType.InkDone });
+	}
+
+	public static void PreScore()
+	{
+		if (OnGameEvent != null)
+			OnGameEvent.Invoke(new GameEvent { myType = GameEvent.EventType.PreScore });
 	}
 }

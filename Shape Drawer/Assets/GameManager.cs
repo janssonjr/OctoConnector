@@ -19,7 +19,7 @@ public enum LevelType
 public enum GameState
 {
     Won,
-    Lose,
+    Lost,
     Playing,
 
     Length
@@ -27,7 +27,6 @@ public enum GameState
 
 public class GameManager : MonoBehaviour
 {
-    public static LevelType levelType = LevelType.Length;
     public static int CurrentLevelIndex = 0;
     public static LevelsContainer Levels;
 	public int Goal
@@ -65,19 +64,14 @@ public class GameManager : MonoBehaviour
 	public Vector3[] path;
 	public float delay = 0.3f;
 	public float tweenTime = 0.9f;
-	int shapesReady;
-	int shapesReadyGoal;
 	int movesLeft;
 	int goal;
-	bool hasScoredThisWave;
-    public static GameState myState = GameState.Length;
-	public static GameState currentWaveState = GameState.Length;
 
-	public int ShapeReadyGoal
-	{
-		set { shapesReadyGoal = value; }
-		get { return shapesReadyGoal; }
-	}
+	public static GameState myWaveState = GameState.Length;
+    public static GameState myLevelState = GameState.Length;
+
+	public BaseGameModeSettings Settings { get; private set; }
+
 
 	private static GameManager instance = null;
 
@@ -99,13 +93,11 @@ public class GameManager : MonoBehaviour
         CreateLevelData();
         EventManager.OnGameEvent += OnGameEvent;
         instance = this;
-        shapesReady = 0;
 		path = new Vector3[transformPath.Length];
 		for (int i = 0; i < transformPath.Length; ++i)
 		{
 			path[i] = transformPath[i].position;
 		}
-		hasScoredThisWave = false;
 	}
 
     private void OnDisable()
@@ -120,14 +112,12 @@ public class GameManager : MonoBehaviour
             case EventManager.GameEvent.EventType.NextLevel:
             case EventManager.GameEvent.EventType.StartGame:
                 {
-                    levelType = obj.myLevelData.LevelType;
                     CurrentLevelIndex = obj.myLevelData.LevelIndex;
-                    myState = GameState.Playing;
-                    shapesReady = 0;
+                    myLevelState = GameState.Playing;
 					Goal = obj.myLevelData.Goal;
 					MovesLeft = obj.myLevelData.Moves;
-					currentWaveState = GameState.Playing;
-					hasScoredThisWave = false;
+					InitializeGameSettings();
+					Settings.Reset();
                     break;
                 }
             case EventManager.GameEvent.EventType.LevelComplete:
@@ -137,15 +127,39 @@ public class GameManager : MonoBehaviour
                 }
             case EventManager.GameEvent.EventType.NewWave:
                 {
-                    shapesReady = 0;
-					hasScoredThisWave = false;
-					currentWaveState = GameState.Playing;
+					Settings.Reset();
+					myWaveState = GameState.Playing;
                     break;
                 }
+			case EventManager.GameEvent.EventType.PreScore:
+				myWaveState = GameState.Won;
+				break;
         }
     }
 
-    public static bool IsLastLevel()
+	private void InitializeGameSettings()
+	{
+		switch (GetCurrentLevelType())
+		{
+			case LevelType.ConnecttAllMoves:
+				Settings = new ConnectAllGameMode();
+				break;
+			case LevelType.ConnectAllTimed:
+				Settings = new ConnectAllTimedGameMode();
+				break;
+			case LevelType.ConnectAmountMoves:
+				Settings = new ConnectAmountGameMode();
+				break;
+			case LevelType.ConnectAmountTime:
+				break;
+			case LevelType.ConnectColor:
+				break;
+			default:
+				break;
+		}
+	}
+
+	public static bool IsLastLevel()
     {
         return CurrentLevelIndex == (Levels.Levels.Count - 1);
     }
@@ -178,115 +192,50 @@ public class GameManager : MonoBehaviour
 
     public void ShapeReady()
     {
-        shapesReady++;
-		switch(GetCurrentLevelType())
-		{
-			case LevelType.ConnecttAllMoves:
-			case LevelType.ConnectAllTimed:
-				ShapeReadyAll();
-				break;
-			case LevelType.ConnectAmountMoves:
-			case LevelType.ConnectAmountTime:
-				ShapeReadyAmount();
-				break;
-		}
+		myWaveState = GameState.Won;
+		Settings.ShapesReadyToFly();
     }
 
-	void ShapeReadyAll()
-	{
-		if (shapesReady == SpawnerManager.Instance.shapeForced.Count && hasScoredThisWave == false)
-		{
-			var shapedForced = SpawnerManager.Instance.shapeForced;
-			ShapeReady(shapedForced);
-		}
-	}
+	//void ShapeReadyAmount()
+	//{
+	//	if (shapesReady > 0 && hasScoredThisWave == false)
+	//	{
+	//		var shapesReady = SpawnerManager.Instance.shapeForced.FindAll(s => { return s.WasDrawn == true; });
+	//		ShapeReady(shapesReady);	
+	//	}
+	//}
 
-	void ShapeReadyAmount()
-	{
-		if (shapesReady > 0 && hasScoredThisWave == false)
-		{
-			var shapesReady = SpawnerManager.Instance.shapeForced.FindAll(s => { return s.WasDrawn == true; });
-			ShapeReady(shapesReady);	
-		}
-	}
 
-	void ShapeReady(List<Shape> aShapeList)
-	{
-		for (int i = 0; i < aShapeList.Count; ++i)
-		{
-			if (i == 0)
-			{
-				aShapeList[i].MoveToTarget();
-				hasScoredThisWave = true;
-			}
-			else
-			{
-				aShapeList[i].gameObject.SetActive(false);
-			}
-		}
-	}
 
-	public void ShapeDrawn()
+	public void CheckIfCanScore()
 	{
-		CheckForWinner();
-	}
-
-	void CheckForWinner()
-	{
-		if (currentWaveState == GameState.Playing)
-		{
-			switch (GetCurrentLevelType())
-			{
-				case LevelType.ConnecttAllMoves:
-					DrawnAll();
-					break;
-				case LevelType.ConnectAllTimed:
-					DrawnAll();
-					break;
-				case LevelType.ConnectAmountMoves:
-					CountDrawnShapes();
-					break;
-			}
-		}
+		Settings.CheckIfCanScore();
 	}
 
 	void CountDrawnShapes()
 	{
-		SpawnerManager spawner = SpawnerManager.Instance;
-		int drawCount = spawner.shapeForced.Count(s => { return s.WasDrawn == true; });
-		if (drawCount > 0 && drawCount == shapesReadyGoal)
-		{
-			currentWaveState = GameState.Won;
-			spawner.shapeForced.ForEach(s => { if(s.WasDrawn) s.MoveToCenter(); });
-			Goal -= drawCount;
-			MovesLeft--;
-			EventManager.WaveComplete();
-		}
-	}
-
-	void DrawnAll()
-	{
-		SpawnerManager spawner = SpawnerManager.Instance;
-		int drawCount = spawner.shapeForced.Count(s => { return s.WasDrawn == true; });
-		Debug.Log("DrawCount: " + drawCount.ToString());
-		if (drawCount == spawner.shapeForced.Count)
-		{
-			spawner.shapeForced.ForEach(s => { s.MoveToCenter(); });
-			WaveComplete();
-			//EventManager.Win(GetCurrentLevelType());
-		}
+		//SpawnerManager spawner = SpawnerManager.Instance;
+		//int drawCount = spawner.shapeForced.Count(s => { return s.WasDrawn == true; });
+		//if (drawCount > 0 && drawCount == shapesReadyGoal)
+		//{
+		//	currentWaveState = GameState.Won;
+		//	spawner.shapeForced.ForEach(s => { if(s.WasDrawn) s.MoveToCenter(); });
+		//	Goal -= drawCount;
+		//	MovesLeft--;
+		//	EventManager.WaveComplete();
+		//}
 	}
 
 	public void WaveFailed()
 	{
 		MovesLeft--;
-		currentWaveState = GameState.Lose;
-		if(MovesLeft <= 0 && myState != GameState.Won)
+		myWaveState = GameState.Lost;
+		if(MovesLeft <= 0 && myLevelState != GameState.Won)
 		{
 			EventManager.GameOver();
 			CanvasManager.OpenPanel(PanelEnum.GameOverPanel);
 		}
-		else
+		else if(myWaveState != GameState.Won)
 		{
 			EventManager.WaveFailed();
 		}
@@ -294,20 +243,22 @@ public class GameManager : MonoBehaviour
 
 	public void WaveComplete()
 	{
-		currentWaveState = GameState.Playing;
 		MovesLeft--;
-		Goal--;
-		EventManager.WaveComplete();
-		
+		Goal -= Settings.GoalAmout;		
 	}
 
 	public void CheckLevelComplete()
 	{
+		WaveComplete();
 		if (Goal <= 0)
 		{
-			myState = GameState.Won;
+			myLevelState = GameState.Won;
 			EventManager.LevelComplete();
 			CanvasManager.OpenPanel(PanelEnum.LevelComplete);
+		}
+		else
+		{
+			EventManager.WaveComplete();
 		}
 	}
 }

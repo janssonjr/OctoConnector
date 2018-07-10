@@ -15,7 +15,7 @@ public class InputManager : MonoBehaviour {
 
     private void OnEnable()
     {
-        shouldCheckForInput = true;
+        shouldCheckForInput = false;
         circleCollider.enabled = false;
         EventManager.OnGameEvent += OnGameEvent;
     }
@@ -47,10 +47,12 @@ public class InputManager : MonoBehaviour {
                     break;
                 }
 			case EventManager.GameEvent.EventType.WaveComplete:
+			case EventManager.GameEvent.EventType.PreScore:
             case EventManager.GameEvent.EventType.GameOver:
             case EventManager.GameEvent.EventType.LevelComplete:
 				shouldCheckForInput = false;
 				ResetLines();
+				Debug.Log("WaveComplete, GameOver or LevelComplete");
 				break;
             case EventManager.GameEvent.EventType.PauseGame:
                 {
@@ -78,6 +80,8 @@ public class InputManager : MonoBehaviour {
             Destroy(lines[i].gameObject);
         }
         lines.Clear();
+		Debug.Log("Reseting lines: " + lines.Count);
+		
     }
 
     void Update ()
@@ -112,54 +116,10 @@ public class InputManager : MonoBehaviour {
             circleCollider.enabled = false;
             if (shouldCheckForInput == true)
             {
-				WinType();
-                
+				GameManager.Instance.Settings.MouseUpAction();                
             }
             ResetLines();
         }
-	}
-
-	void WinType()
-	{
-		switch (GameManager.GetCurrentLevelType())
-		{
-			case LevelType.ConnecttAllMoves:
-				ConnectAll();
-				break;
-			case LevelType.ConnectAllTimed:
-				ConnectAll();
-				break;
-			case LevelType.ConnectAmountMoves:
-				ConnectAmount();
-				break;
-			case LevelType.ConnectAmountTime:
-				break;
-			case LevelType.ConnectColor:
-				break;
-		}
-	}
-
-	void ConnectAll()
-	{
-		if (spawner.shapeForced.Count > 0)
-		{
-			foreach (var shape in spawner.shapeForced)
-			{
-				shape.WasDrawn = false;
-				shape.canBePressed = true;
-				shape.rb.bodyType = RigidbodyType2D.Dynamic;
-			}
-		}
-	}
-
-	void ConnectAmount()
-	{
-		int amount = spawner.shapeForced.Count(s => { return s.WasDrawn == true; });
-		if(amount > 0)
-		{
-			GameManager.Instance.ShapeReadyGoal = amount;
-			GameManager.Instance.ShapeDrawn();
-		}
 	}
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -174,6 +134,7 @@ public class InputManager : MonoBehaviour {
             {
                 shape.OnPressed();
                 shape.rb.bodyType = RigidbodyType2D.Static;
+				Debug.Log("Changing "+shape.name+" to static");
                 taggedShapes.Add(collision.transform.position);
                 if(lines.Count > 0)
                 {
@@ -190,15 +151,15 @@ public class InputManager : MonoBehaviour {
 				LevelType levelType = GameManager.GetCurrentLevelType();
 				if (levelType == LevelType.ConnecttAllMoves || levelType == LevelType.ConnectAllTimed)
 				{
-					GameManager.Instance.ShapeDrawn();
+					GameManager.Instance.CheckIfCanScore();
 				}
 				else
 				{
 					int count = spawner.shapeForced.Count(s => { return s.WasDrawn == true; });
 					if (count == spawner.shapeForced.Count)
 					{
-						GameManager.Instance.ShapeReadyGoal = count;
-						GameManager.Instance.ShapeDrawn();
+						//GameManager.Instance.ShapeReadyGoal = count;
+						GameManager.Instance.CheckIfCanScore();
 					}
 				}
 			}

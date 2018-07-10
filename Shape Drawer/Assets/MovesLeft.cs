@@ -28,6 +28,7 @@ public class MovesLeft : MonoBehaviour, LevelCountDown<int>
 			case EventManager.GameEvent.EventType.WaveComplete:
 			case EventManager.GameEvent.EventType.WaveFailed:
 			case EventManager.GameEvent.EventType.GameOver:
+			case EventManager.GameEvent.EventType.LevelComplete:
 				{
 					UpdateGraphics();
 					break;
