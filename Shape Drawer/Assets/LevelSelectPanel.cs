@@ -19,15 +19,10 @@ public class LevelSelectPanel : Panel {
     private void OnEnable()
     {
 		haveSetPosition = false;
-		//Debug.Log("0%3 = " + (0 % 3));
-		//Debug.Log("1%3 = " + (1 % 3));
-		//Debug.Log("2%3 = " + (2 % 3));
-		//Debug.Log("3%3 = " + (3 % 3));
-		//Debug.Log("4%3 = " + (4 % 3));
-		//Debug.Log("5%3 = " + (5 % 3));
-
+		levelParent.sizeDelta = Vector2.zero;
 		ClearLevelButtons();
-        List<LevelData> levels = GameManager.Levels.Levels;
+
+		List<LevelData> levels = GameManager.Levels.Levels;
         for(int i = 0; i < levels.Count; ++i)
         {
             var entry = Instantiate(levelButtonPrfab, levelParent);
