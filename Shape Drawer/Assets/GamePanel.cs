@@ -82,26 +82,38 @@ public class GamePanel : Panel {
 
 	void SetCountDownData()
 	{
-		LevelType levelType = GameManager.GetCurrentLevelType();
-		levelTimer.gameObject.SetActive(false);
-		movesLeft.gameObject.SetActive(false);
-		switch (levelType)
+		if(GameManager.Instance.Settings.IsTimedLevel() == true)
 		{
-			case LevelType.ConnecttAllMoves:
-				movesLeft.gameObject.SetActive(true);
-				movesLeft.SetCountDownData(myLevelData.Moves);
-				break;
-			case LevelType.ConnectAllTimed:
-				levelTimer.gameObject.SetActive(true);
-				levelTimer.SetCountDownData(myLevelData.Time);
-				break;
-			case LevelType.ConnectAmountMoves:
-				movesLeft.gameObject.SetActive(true);
-				movesLeft.SetCountDownData(myLevelData.Moves);
-				break;
-			default:
-				break;
+			movesLeft.gameObject.SetActive(false);
+			levelTimer.gameObject.SetActive(true);
+			levelTimer.SetCountDownData(myLevelData.Time);
 		}
+		else
+		{
+			levelTimer.gameObject.SetActive(false);
+			movesLeft.gameObject.SetActive(true);
+			levelTimer.SetCountDownData(myLevelData.Moves);
+		}
+		//LevelType levelType = GameManager.GetCurrentLevelType();
+		//levelTimer.gameObject.SetActive(false);
+		//movesLeft.gameObject.SetActive(false);
+		//switch (levelType)
+		//{
+		//	case LevelType.ConnecttAllMoves:
+		//		movesLeft.gameObject.SetActive(true);
+		//		movesLeft.SetCountDownData(myLevelData.Moves);
+		//		break;
+		//	case LevelType.ConnectAllTimed:
+		//		levelTimer.gameObject.SetActive(true);
+		//		levelTimer.SetCountDownData(myLevelData.Time);
+		//		break;
+		//	case LevelType.ConnectAmountMoves:
+		//		movesLeft.gameObject.SetActive(true);
+		//		movesLeft.SetCountDownData(myLevelData.Moves);
+		//		break;
+		//	default:
+		//		break;
+		//}
 	}
 
 	public void PauseGame()

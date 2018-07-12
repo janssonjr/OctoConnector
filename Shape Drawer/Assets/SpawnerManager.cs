@@ -149,7 +149,8 @@ public class SpawnerManager : MonoBehaviour {
             if (shapeForced.Find(a => { return a == shapeToRemove; }) == null)
                 return;
             if (shapeToRemove.WasDrawn == false && shapeForced.Count > 0
-				&& shouldCheckWinCondition == true && GameManager.myWaveState != GameState.Won)
+				&& shouldCheckWinCondition == true && GameManager.myWaveState != GameState.Won
+				&& GameManager.Instance.Settings.IsTimedLevel() == false)
             {
 				GameManager.Instance.WaveFailed();
                 shouldCheckWinCondition = false;
