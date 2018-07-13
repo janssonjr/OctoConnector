@@ -206,6 +206,11 @@ public class Shape : MonoBehaviour {
 		scoreParticles.Emit(100);
 	}
 
+	public void SetStartPosition(Vector3 aPosition)
+	{
+		startPosition = aPosition;
+	}
+
     public void ResetPosition()
     {
         transform.position = startPosition;

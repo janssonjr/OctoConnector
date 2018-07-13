@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -8,7 +8,7 @@ public class SpawnerManager : MonoBehaviour {
 
     public List<Rigidbody2D> shapes = new List<Rigidbody2D>();
     public List<Shape> shapeForced = new List<Shape>();
-
+	public BoxCollider2D box;
     private static SpawnerManager instance;
 
     public static SpawnerManager Instance
@@ -104,7 +104,7 @@ public class SpawnerManager : MonoBehaviour {
         {
             yield return new WaitForSeconds(1f);
 			int range = UnityEngine.Random.Range(2, shapes.Count + 1);
-
+			List<Vector2> colliders = new List<Vector2>();
 			if (GameManager.myLevelState == GameState.Playing)
 			{
 				shapeForced.Clear();
@@ -113,10 +113,27 @@ public class SpawnerManager : MonoBehaviour {
 				Shuffle();
 				for (int i = 0; i < range; ++i)
 				{
-					//500 - 700
-					shapes[i].AddForce(Vector2.up * UnityEngine.Random.Range(500, 650));
+					shapes[i].transform.localPosition = GetRandomPositionInCollider();
+					bool iscollidingWithOther = true;
+					while(iscollidingWithOther)
+					{
+						bool isNotTouchingAny = colliders.TrueForAll(b =>
+						{
+							return Mathf.Abs(b.x - shapes[i].transform.localPosition.x) > 0.7;
+						});
+
+						if (isNotTouchingAny == true)
+							break;
+						shapes[i].transform.localPosition = GetRandomPositionInCollider();
+
+					}
+
+					shapes[i].AddForce(Vector2.up * UnityEngine.Random.Range(520, 700));
 					shapeForced.Add(shapes[i].GetComponent<Shape>());
 					shapeForced[shapeForced.Count - 1].Launched();
+
+					yield return new WaitForSeconds(UnityEngine.Random.Range(0.01f, 0.3f));
+					colliders.Add(shapes[i].transform.localPosition);
 
 				}
 			}
@@ -230,5 +247,15 @@ public class SpawnerManager : MonoBehaviour {
 			Shape shape = s.GetComponent<Shape>();
 			shape.RemoveTween();
 		}
+	}
+
+	Vector2 GetRandomPositionInCollider()
+	{
+		Vector2 returnVector = Vector2.zero;
+		float cameraSize = Camera.main.orthographicSize;
+		returnVector.x = UnityEngine.Random.Range(-((cameraSize - 1) / 2), (cameraSize - 1) / 2);
+		returnVector.y = -6f;
+
+		return returnVector;
 	}
 }
