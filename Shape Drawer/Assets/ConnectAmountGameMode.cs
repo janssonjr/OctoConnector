@@ -12,7 +12,7 @@ class ConnectAmountGameMode : BaseGameModeSettings
 		List<Shape> drawnShapes = spawner.shapeForced.FindAll(s => { return s.WasDrawn == true; });
 		if (drawnShapes != null)
 		{
-			if (drawnShapes.Count > 1)
+			if (drawnShapes.Count > 0)
 			{
 				EventManager.PreScore();
 				drawnShapes.ForEach(s =>
